@@ -1,0 +1,16 @@
+.food::before {
+  content: "";
+  position: absolute;
+  width: 25px;
+  height: 25px;
+  background-color: darkgreen;
+  border-radius: 100%;
+  z-index: 4;
+}
+
+.food {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
