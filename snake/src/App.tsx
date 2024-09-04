@@ -31,10 +31,16 @@ const App = () => {
   });
 
   const snakeRef = useRef(snake);
+  const foodRef = useRef(food);
 
   useEffect(() => {
+    console.log(snakeRef.current);
     snakeRef.current = snake;
   }, [snake]);
+
+  useEffect(() => {
+    foodRef.current = food;
+  }, [food]);
 
   // update stage
   useEffect(() => {
@@ -47,7 +53,11 @@ const App = () => {
         } else if (i == snake.head.y && j == snake.head.x) {
           row.push(2);
         } else {
-          row.push(0);
+          if (snake.body.find((pos) => pos.x == j && pos.y == i)) {
+            row.push(3);
+          } else {
+            row.push(0);
+          }
         }
       }
       newStage.push(row);
@@ -59,13 +69,60 @@ const App = () => {
     // remove the last at the body
     // set head to new position
     let newSnake = { ...snakeRef.current };
+    let newFood = { ...foodRef.current };
+
+    if (
+      newSnake.head.x + dx < 0 ||
+      newSnake.head.x + dx >= 20 ||
+      newSnake.head.y + dy < 0 ||
+      newSnake.head.y + dy >= 20 ||
+      (newSnake.body.length > 0 &&
+        newSnake.head.x + dx == newSnake.body[0].x &&
+        newSnake.head.y + dy == newSnake.body[0].y) ||
+      newSnake.body.find(
+        (pos) => newSnake.head.x + dx == pos.x && newSnake.head.y + dy == pos.y
+      )
+    ) {
+      console.log(
+        newSnake.body.find(
+          (pos) =>
+            newSnake.head.x + dx == pos.x && newSnake.head.y + dy == pos.y
+        )
+      );
+      return;
+    }
     if (newSnake.body.length > 0) {
       newSnake.body.pop();
+      newSnake.body.unshift(newSnake.head);
     }
     newSnake.head = {
       x: newSnake.head.x + dx,
       y: newSnake.head.y + dy,
     };
+
+    if (newSnake.head.x == newFood.x && newSnake.head.y == newFood.y) {
+      if (newSnake.body.length > 0) {
+        newSnake.body.push({
+          x: snakeRef.current.body[snakeRef.current.body.length - 1].x - dx,
+          y: snakeRef.current.body[snakeRef.current.body.length - 1].y - dy,
+        });
+      } else {
+        newSnake.body.push({
+          x: snakeRef.current.head.x,
+          y: snakeRef.current.head.y,
+        });
+      }
+      setFood(() => {
+        let res = { x: randomPosition(), y: randomPosition() };
+        while (
+          (snake.head.x === res.x && snake.head.y === res.y) ||
+          snake.body.find((pos) => pos.x === res.x && pos.y === res.y)
+        ) {
+          res = { x: randomPosition(), y: randomPosition() };
+        }
+        return res;
+      });
+    }
     setSnake({ ...newSnake });
   };
 
@@ -116,6 +173,13 @@ const App = () => {
                   <div
                     key={index}
                     className="flex bg-yellow-200 p-6 border"
+                  ></div>
+                );
+              } else if (cell == 3) {
+                return (
+                  <div
+                    key={index}
+                    className="flex bg-green-200 p-6 border"
                   ></div>
                 );
               }
