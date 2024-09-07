@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+<script>
+        // in this way, the prototype will contains a Person instance
+        // which contains duplicate info
+        function Person() {
+            this.name = 'xyf'
+            this.eats = ['apple']
+            this.getName = function() {
+                console.log(this.eats)
+            }
+        }
+
+        Person.prototype.get = () => {
+            console.log('Person prototype method')
+        }
+        function Student () {
+            Person.call(this)
+        }
+
+        Student.prototype = new Person();
+        
+        const student1 = new Student();
+        student1.getName()
+        console.log(student1.name)
+        student1.eats.push('banana')
+        console.log(student1.eats)
+        student1.get()
+
+        console.log('---------------------')
+
+        const student2 = new Student();
+        student2.name = 'jy'
+        console.log(student2.name)
+        console.log(student2.eats)
+        console.log(student2)
+</script>
+</body>
+</html>
